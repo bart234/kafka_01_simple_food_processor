@@ -1,0 +1,49 @@
+services:
+  kafka:
+    image: confluentinc/cp-kafka:7.8.3
+    container_name: kafka
+    ports:
+      - "9092:9092"
+    environment:
+      # pointless -KAFKA_KRAFT_MODE: 'true'  #buldin system which allow kafka to manage its own meta data
+      CLUSTER_ID: 'sdfko23o-23kk4kd-gg0043'
+      KAFKA_NODE_ID: 1    #number of brockers which we will deploy
+
+      #role which will be play that one node
+      KAFKA_PROCESS_ROLES: broker,controller  
+
+      #it decide which broker/controller can vote on cluster decisions
+      #if is more then one, another are backups
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@kafka:9093  #2@kafka:9093
+
+      #no metadata backup = 1 copy , default is 3
+      #it mean that kafka will keep only one copy of meta data
+      #if that copy/broker crash, there is not a place from where it can get data
+      #how to restore events and traffic, traffic will be lost
+      #kafka usually know which consumer got which  event and witch topis
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+
+      #added by ai fix
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+
+      #port managment
+      #one(plaintext): for regular data traffic  
+      #   here 9092 - producers and consumers conenct ot kafka
+      #second(controller) for controller coommunication
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092,CONTROLLER://0.0.0.0:9093
+
+      #kafka is telling that address to client/broker to connect to
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+
+      #where to store logs, backups and so on
+      #to presist it we need docker volume
+      KAFKA_LOG_DIRS: /tmp/kraft-combined-logs
+
+    # volumes:
+    #   - kafka_kraft:/var/lib/kafka/data
+
+  # volumes:
+  #   kafka_kraft:
