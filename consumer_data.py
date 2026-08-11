@@ -36,6 +36,10 @@ try:
         print(f"Data from kafka: {order_data["quantity"]} x  {order_data["item"]} x  {order_data["user"]}")
 except KeyboardInterrupt:
     print("Stopping consumer")
+finally:
+    #we always want ot close that connection
+    consumer_.close()
+
 
 #we can handle Keyboard Interruption error
 #we have to prepare  disconnection - if connection will break
