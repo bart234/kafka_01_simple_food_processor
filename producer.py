@@ -19,13 +19,13 @@ def delivery_report(err,msg):
 order = {"order_id": str(uuid.uuid4()),
          "user":"t2",
          "item":"mushroom pizza",
-         "quantity":2}
+         "quantity":188}
 
 #kafka data are bites 
 order_in_kafka_format = json.dumps(order).encode("utf-8")
 
 #topic is a kind of eent which we end with data
-#callback is for  info if delivery was completed
+#callback is for  info if delivery was completed    
 producer.produce(
     topic="orders", 
     value=order_in_kafka_format,

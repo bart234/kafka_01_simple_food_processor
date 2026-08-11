@@ -19,7 +19,7 @@ consumer_config = {
 consumer_ = Consumer(consumer_config)
 
 #we select to which even we would like subscribe
-consumer_.subscribe(["orders"])
+consumer_.subscribe(["orders","confirmation"])
 
 print("Consumer is running, subscribed to orders topic")
 
@@ -31,9 +31,15 @@ try:
         if msg.error():
             print(f"Error msg: {msg.error()}")
             continue
+
         mmessege= msg.value().decode("utf-8")
         order_data = json.loads(mmessege)
-        print(f"Data from kafka: {order_data["quantity"]} x  {order_data["item"]} x  {order_data["user"]}")
+
+        if msg.topic()=="orders":
+            print(f"Data from kafka: {order_data["quantity"]} x  {order_data["item"]} x  {order_data["user"]}")
+        elif msg.topic()=="confirmation":
+            print(f"Confirmation from storage check: status: {order_data["confirmed"]} ,qty:  {order_data["qty"]}")
+
 except KeyboardInterrupt:
     print("Stopping consumer")
 finally:
